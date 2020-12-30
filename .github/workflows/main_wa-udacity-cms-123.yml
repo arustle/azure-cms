@@ -20,17 +20,15 @@ jobs:
       with:
         python-version: '3.7'
 
-    - name: Update Environment Variables
-      env:
-        AUTHORITY: ${{ secrets.AUTHORITY }}
-        CLIENT_ID: ${{ secrets.CLIENT_ID }}
-        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-
     - name: Build using AppService-Build
       uses: azure/appservice-build@v2
       with:
         platform: python
         platform-version: '3.7'
+      env:
+        AUTHORITY: ${{ secrets.AUTHORITY }}
+        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
     - name: 'Deploy to Azure Web App'
       uses: azure/webapps-deploy@v2
