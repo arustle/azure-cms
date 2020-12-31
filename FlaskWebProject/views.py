@@ -65,17 +65,21 @@ def post(id):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
+        app.logger.warning("LOGIN - AUTHENTICATED - REDIRECT TO HOME");
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
+            app.logger.warning("LOGIN - ERROR - Invalid username or password");
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('home')
+
+        app.logger.warning("LOGIN - REDIRECT TO NEXT PAGE");
         return redirect(next_page)
     session["state"] = str(uuid.uuid4())
     auth_url = _build_auth_url(scopes=Config.SCOPE, state=session["state"])
@@ -85,8 +89,10 @@ def login():
 @app.route(Config.REDIRECT_PATH)  # Its absolute URL must match your app's redirect_uri set in AAD
 def authorized():
     if request.args.get('state') != session.get("state"):
+        app.logger.warning("AUTH - FAILURE");
         return redirect(url_for("home"))  # No-OP. Goes back to Index page
     if "error" in request.args:  # Authentication/Authorization failure
+        app.logger.warning("AUTH - AUTH ERROR 1");
         return render_template("auth_error.html", result=request.args)
     if request.args.get('code'):
         cache = _load_cache()
@@ -97,10 +103,12 @@ def authorized():
             redirect_uri=url_for('authorized', _external=True,_scheme='https')
         )
         if "error" in result:
+            app.logger.warning("AUTH - AUTH ERROR 2");
             return render_template("auth_error.html", result=result)
         session["user"] = result.get("id_token_claims")
         # Note: In a real app, we'd use the 'name' property from session["user"] below
         # Here, we'll use the admin username for anyone who is authenticated by MS
+        app.logger.warning("AUTH - SUCCESSFUL");
         user = User.query.filter_by(username="admin").first()
         login_user(user)
         _save_cache(cache)
