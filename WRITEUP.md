@@ -14,7 +14,6 @@ App Services offer different pricing based on Number of Apps, Disk Space, Number
 
 For this project I would choose the App Service.  The app uses Python, which is supported by App Services.  A VM is not necessary, because the application is a simple web app, and the VM would just be hosting the application.  There's no real reason why the developer should be concerned with setting up the web server, firewall, etc on the VM.
 
-This application requires a database, blob storage and a website.  A VM is not really necessary because it would just be hosting a simple web app.  We would be responsible for setting up the web server, firewall, etc in the VM.  The Azure App Service makes more sense because our only responsibility is the web app.
 
 ### Assess app changes that would change your decision.
 
